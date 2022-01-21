@@ -1,0 +1,95 @@
+---
+title: "Situación de la Red vial"
+output: 
+  flexdashboard::flex_dashboard:
+    logo: data/logo.png
+    horizontal_layout: scroll
+    navbar:
+       - { title: "Tableu:tipo de superficie", href: "https://public.tableau.com/views/RVN-Agosto2021/dash_RVN?%3Adisplay_static_image=y&%3AbootstrapWhenNotified=true&%3Aembed=true&%3Alanguage=es-ES&publish=yes&:embed=y&:showVizHome=n&:apiID=host0", align: right}
+    theme : lumen
+   
+---
+<style>
+.navbar-logo{
+width:30px;
+}
+</style>
+
+```{r}
+library(leaflet)
+library(tidyverse)
+library(sf)
+library(DT)
+library(crosstalk)
+# Lectura de datos 
+data <- st_read("data/RVN-2.gpkg",quiet = TRUE)
+```
+
+Presentación
+=========================================
+Columna 1 
+-----------------------------------------
+### Sistema Nacional de Carreteras (SINAC) 
+<p1> Se jerarquiza en las siguientes tres redes viales: Red Vial Nacional, Red Vial Departamental o Regional y Red Vial Vecinal o Rural</p1>
+
+<p2>Red Vial Nacional.- Corresponde a las carreteras de interés nacional conformada por los principales ejes longitudinales y transversales, se constituye elemento receptor de las carreteras Departamentales o Regionales y de las carreteras Vecinales o Rurales.</p2>
+
+
+
+
+```{r}
+data %>% 
+  leaflet() %>% 
+  addTiles(group = "Open Street Map") %>% 
+  addProviderTiles("Esri.WorldImagery",group = "Satelital") %>% 
+  addProviderTiles("CartoDB.Positron",group = "Carto Positron") %>% 
+  addProviderTiles("CartoDB.DarkMatter",group = "Carto Dark") %>% 
+  addLayersControl(
+    baseGroups = c("Open Street Map","Satelital","Carto Positron","Carto Dark")
+    ) %>% 
+  addPolygons(popup = data$NOMDIS)
+
+
+
+
+```
+
+Columna 2
+-----------------------------------------
+### Estadística
+
+```{r}
+
+```
+
+### Descarga en formato
+
+```{r}
+data %>% 
+  st_set_geometry(NULL) %>%
+  datatable(
+    filter = "top",  
+    extensions = c(
+      "Buttons",  
+      "Scroller"),
+    rownames = FALSE, 
+    class = "compact",
+    width = "100%",
+    options = list(
+      dom = "Blrtip",
+      deferRender = TRUE,
+      scrollY = 300,
+      scroller = TRUE,
+      buttons = list(
+        "excel",
+        "csv")
+      )
+    )
+```
+
+
+
+
+
+
+
